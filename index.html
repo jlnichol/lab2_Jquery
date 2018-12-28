@@ -1,0 +1,120 @@
+<html>
+<head>
+    <title>City Finder</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css">
+    <link rel="stylesheet" href="main.css">
+    <script
+    src= "http://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script>
+$(document).ready(function() {
+$("#cityField").keyup(function() {
+  var url = "http://bioresearch.byu.edu/cs260/jquery/getcity.cgi?q="+$("#cityField").val();
+$.getJSON(url,function(data) {
+    var everything;
+    everything = "<ul>";
+    $.each(data, function(i,item) {
+      everything += "<li> "+data[i].city;
+    });
+    everything += "</ul>";
+    $("#txtHint").html(everything);
+  })
+  .done(function() { console.log('getJSON request succeeded!'); })
+  .fail(function(jqXHR, textStatus, errorThrown) { 
+    console.log('getJSON request failed! ' + textStatus); 
+    console.log("incoming "+jqXHR.responseText);
+  })
+  .always(function() { console.log('getJSON request ended!');
+  });
+});
+$("#weatherButton").click(function(e){
+  var value = $("#cityField").val();
+  console.log(value);
+  e.preventDefault();
+  $("#displayCity").text(value);
+
+var myurl= "https://api.openweathermap.org/data/2.5/weather?units=imperial&appid=da2490aff8170a58372f23f3741c984d&q=";
+  myurl += value;
+  console.log(myurl);
+  $.ajax({
+    url : myurl,
+    dataType : "json",
+        success : function(parsed_json) {
+            var location = parsed_json['name'];
+            var weather = parsed_json['weather'][0]['main'];
+            var temp = parsed_json['main']['temp'];
+            var weather_icon = parsed_json['weather'][0]['icon'];
+            var humidity = parsed_json['main']['humidity'];
+            var temp_min = parsed_json['main']['temp_min'];
+            var temp_max = parsed_json['main']['temp_max'];
+            var wind_speed = parsed_json['wind']['speed'];
+            everything = "<img src=\"http://openweathermap.org/img/w/" + weather_icon + ".png\"/>";
+            everything += "<ul>";
+            everything += "<li>Location: " + location;
+            everything += "<li>Weather: " + weather + " (" + temp + "&#8457;)";
+            everything += "<li>Low: " + temp_min + "&#8457; | High: " + temp_max + "&#8457;";
+            everything += "<li>Humidity: " + humidity + "%";
+            everything += "<li>Wind: " + wind_speed + " mph";
+            everything += "</ul>";
+            $("#weather").html(everything);
+        }
+  });
+});
+});
+</script>
+</head>
+<body>
+    <nav class= "navbar">
+      <div class= "container">
+        <div class= "navbar-brand">
+      <span class="navbar-burger burger" data-target= "navbarMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+      </div>
+      <div id="navbarMenu" class="navbar-menu">
+        <div class="navbar-end">
+          <a class="navbar-item is-active"> City Finder </a>
+          <a href="stacker.html" class="navbar-item"> StackExchange Asker </a>
+        </div>
+      </div>
+      </div>
+    </nav>
+            <div class="hero-body">
+                <div class="columns is-vcentered">
+                    
+                    <div class="column is-5">
+                        <figure class="image is-4by3">
+                            <img src="https://c2.staticflickr.com/4/3749/9299939868_73344ca758_b.jpg" alt="Utah">
+                        </figure>
+                    </div>
+                    <div class="column is-6 is-offset-1">
+                        
+                        <h1 class="title is-2">
+                            City Finder
+                        </h1>
+                        <h2 class="subtitle is-4">
+                            Input a city in Utah to find its weather
+                        </h2>
+                        
+                        <br>
+                        
+                            <form>
+                        Enter A Utah City: <input type="text" id="cityField" value=""><br>
+                        Suggestion: <span id="txtHint">Empty</span>
+                        <br>
+                        <input class="button is-medium is-outlined" id="weatherButton" type="submit" value="Submit">
+                        </form>
+                        <br>
+                        <p>City</p>
+                        <textarea id="displayCity">No City</textarea>
+                        <br>
+                        <div class= "weather">
+                        <p>Current Weather</p>
+                        <div id="weather">No weather</div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+</html>
